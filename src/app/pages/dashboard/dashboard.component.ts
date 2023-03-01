@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import Chart from 'chart.js';
-
+import axios from 'axios';
 
 @Component({
     selector: 'dashboard-cmp',
@@ -15,7 +15,8 @@ export class DashboardComponent implements OnInit{
   public chartColor;
   public chartEmail;
   public chartHours;
-
+  public deviceNum = 0;
+  public maliciousRequest = 0
     ngOnInit(){
       // this.chartColor = "#FFFFFF";
 
@@ -162,58 +163,63 @@ export class DashboardComponent implements OnInit{
       //     },
       //   }
       // });
-      function drawLineChart() {
-        const speedCanvas = document.getElementById("lineChart");
-        console.log(speedCanvas)
-        function generateRandomData(count=24) {
-          const result = [];
-          for (let i = 0; i < count; i++) {
-            result.push(Math.floor(Math.random() * 10))
-          }
-          return result
-        }
-        var dataFirst = {
-          data: generateRandomData(),
-          fill: false,
-          borderColor: '#FF5733',
-          backgroundColor: 'transparent',
-          pointBorderColor: '#FF5733',
-          pointRadius: 4,
-          pointHoverRadius: 4,
-          pointBorderWidth: 8,
-        };
-  
-        var dataSecond = {
-          data: generateRandomData(),
-          fill: false,
-          borderColor: '#51bcda',
-          backgroundColor: 'transparent',
-          pointBorderColor: '#51bcda',
-          pointRadius: 4,
-          pointHoverRadius: 4,
-          pointBorderWidth: 8
-        };
-  
-        var speedData = {
-          labels: [...Array(24).keys()],
-          datasets: [dataFirst, dataSecond]
-        };
-  
-        const chartOptions = {
-          legend: {
-            display: false,
-            position: 'top'
-          }
-        };
-        
-        const lineChart = new Chart(speedCanvas, {
-          type: 'line',
-          hover: false,
-          data: speedData,
-          options: chartOptions
-        });
-      }
-      setTimeout(drawLineChart, 1000);
 
+      this.deviceNum = 20;
+
+      axios.get('https://official-joke-api.appspot.com/random_joke').then(r => {
+        console.log(r)
+        this.drawLineChart();
+      })
+
+    }
+    drawLineChart() {
+      const speedCanvas = document.getElementById("lineChart");
+      function generateRandomData(count=24) {
+        const result = [];
+        for (let i = 0; i < count; i++) {
+          result.push(Math.floor(Math.random() * 10))
+        }
+        return result
+      }
+      var dataFirst = {
+        data: generateRandomData(),
+        fill: false,
+        borderColor: '#FF5733',
+        backgroundColor: 'transparent',
+        pointBorderColor: '#FF5733',
+        pointRadius: 4,
+        pointHoverRadius: 4,
+        pointBorderWidth: 8,
+      };
+
+      var dataSecond = {
+        data: generateRandomData(),
+        fill: false,
+        borderColor: '#51bcda',
+        backgroundColor: 'transparent',
+        pointBorderColor: '#51bcda',
+        pointRadius: 4,
+        pointHoverRadius: 4,
+        pointBorderWidth: 8
+      };
+      this.maliciousRequest = dataFirst.data.reduce((partialSum, a) => partialSum + a, 0);
+      var speedData = {
+        labels: [...Array(24).keys()],
+        datasets: [dataFirst, dataSecond]
+      };
+
+      const chartOptions = {
+        legend: {
+          display: false,
+          position: 'top'
+        }
+      };
+      
+      const lineChart = new Chart(speedCanvas, {
+        type: 'line',
+        hover: false,
+        data: speedData,
+        options: chartOptions
+      });
     }
 }

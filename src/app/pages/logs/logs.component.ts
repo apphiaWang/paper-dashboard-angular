@@ -9,7 +9,44 @@ import { ToastrService } from "ngx-toastr";
 })
 
 export class LogsComponent{
+  public iotRequests;
   constructor(private toastr: ToastrService) {}
+  convertTime(timestamp) {
+    const time = new Date(timestamp*1000);
+    return `${time.getFullYear()}-${time.getMonth()}-${time.getDate()}\
+     ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+  }
+  generateAlertFromLog(log) {
+    return `${log.label} ${log.proto} request recceived at ${this.convertTime(log.ts)}\n`
+      + `contains ${log.orig_pkts} packets, ${log.orig_ip_bytes} bytes`;
+  }
+  ngOnInit(){
+    const responseData = [{
+      "id.orig_h": "192.168.100.103",
+      "id.orig_p": "55124",
+      "id.resp_h": "65.127.233.163",
+      "id.resp_p": "23",
+      "ts": 1525879831,
+      "orig_pkts": 1,
+      "orig_ip_bytes": 60,
+      "proto": "tcp",
+      "service": "http",
+      "label": "Malicious"
+  },
+  {
+      "id.orig_h": "192.168.100.103",
+      "id.orig_p": "56305",
+      "id.resp_h": "63.150.16.171",
+      "id.resp_p": "23",
+      "ts": 1525898831,
+      "orig_pkts": 3,
+      "orig_ip_bytes": 180,
+      "proto": "tcp",
+      "service": "http",
+      "label": "Benign"
+  }];
+    this.iotRequests = responseData.map(l => ({label: l.label, text: this.generateAlertFromLog(l)})) 
+  }
   showNotification(from, align) {
     const color = Math.floor(Math.random() * 5 + 1);
 
